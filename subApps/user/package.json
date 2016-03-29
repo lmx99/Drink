@@ -1,0 +1,21 @@
+{
+  "name": "user",
+  "version": "1.0.0",
+  "description": "user module",
+  "main": "app.js",
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "repository": {
+    "type": "git",
+    "url": "user"
+  },
+  "keywords": [
+    "user"
+  ],
+  "author": "amos",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.13.4"
+  }
+}

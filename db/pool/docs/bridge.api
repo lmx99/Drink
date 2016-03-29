@@ -1,0 +1,55 @@
+//api of bridge
+//if suffix '()' means function, else object;
+{
+	
+
+	type : function,
+
+	params : (
+		string db : [database type, default 'mysql']
+	),
+
+	return : {
+
+		type: object,
+		structure:{
+			user:{
+				type: class,
+				params: (),
+				proto: {
+					type: object
+					apis:{
+
+						getUserInfo(username) : {
+							params:(
+								string username,
+							),
+							return:{
+								type:json,
+								structrue:{
+									username : string,
+									email : string,
+									age : int,
+
+								}
+							}
+						},
+
+
+					}
+				}
+			},
+			finance:{
+
+			},
+			asset:{
+
+			},
+			material:{
+
+			}
+		}
+		
+	}
+
+}
