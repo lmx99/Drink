@@ -14,13 +14,13 @@ var UserLG = function(){
 				var PIN = '0123456789'.repeat(6).shuffle().substr(0,6);
 			}else{
 
-				return Promise.reject($.lng.PHONE_NUMBER_ERR);
+				return $().reject($.lng.PHONE_NUMBER_ERR);
 			}
 
 			//interplete third PIN server;
 
 			//test
-			return Promise.resolve(PIN);
+			return $().resolve(PIN);
 		}
 
 		this.checkPIN = (localPIN, sendPIN) => {
@@ -71,12 +71,10 @@ var UserLG = function(){
 			}
 
 			var promiseAccessConditions = _.values( accessConditions ).map(function(func) {
-				return new Promise(func);
+				return $(func);
 			});
-
-
-
-			return Promise.all( promiseAccessConditions ).then((arr)=>{
+			
+			return $(promiseAccessConditions).then((arr)=>{
 
 				dbi.addUser({
 					user_name : data.username,
