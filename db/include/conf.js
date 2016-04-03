@@ -1,5 +1,5 @@
 module.exports = function (db,server){
-	var defaultConfig = require('../../include/config.js');
+	var defaultConfig = require(ROOT_DIR+'/include/config.js');
 	
 	var dbConfig = {
 
@@ -32,7 +32,7 @@ module.exports = function (db,server){
 
 
 	db =  db || defaultConfig.db;
-	server = server || defaultConfig.server
+	server = server || defaultConfig.server;
 
 	return dbConfig[db][server];
 

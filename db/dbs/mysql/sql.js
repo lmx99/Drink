@@ -1,8 +1,7 @@
 module.exports = function(){
-
+	console.log('sql.js;');
 	return {
-		Finance: require('./sqls/finance.js'),
 		User: require('./sqls/user.js')
-	}
+	};
 	
 }();

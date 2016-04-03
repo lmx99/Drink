@@ -1,11 +1,10 @@
 module.exports = function(cf){
 
 	return {
-		name: cf.prefix+'users',
-		fileds: [],
-		add:function(){
-			
-		}
+
+		id:'user_id',
+		name: cf.prefix+'pub_users',
+		fields: ['user_name','password','id_phone']
 	};
 
 };

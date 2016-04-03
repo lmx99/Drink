@@ -1,8 +1,7 @@
 var express = require('express'),
-    fs      = require('fs'),
-    _       = require('underscore'),
-    Promise = require('promise')
+    fs      = require('fs')
     ;
+
 
 module.exports = function(options) {
     
@@ -94,10 +93,8 @@ module.exports = function(options) {
 	    		});
 	    	}
     	})
-    })
-    .catch((err)=>{
-    	console.log(err);
     });
+
 
     return router;
 

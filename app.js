@@ -1,12 +1,16 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-global.ROOT_DIR = __dirname;
-var router = require(ROOT_DIR+'/include/routes.js')({verbose:true});
-var app = express();
+
+var express = require('express'),
+    path = require('path'),
+    favicon = require('serve-favicon'),
+    logger = require('morgan'),
+    cookieParser = require('cookie-parser'),
+    bodyParser = require('body-parser'),
+    session = require('express-session');
+
+require('./include/xframe.js');
+
+var router = require(ROOT_DIR+'/include/routes.js')({verbose:true}),
+    app = express();
 
 
 // uncomment after placing your favicon in /public
@@ -15,6 +19,11 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(session({
+  resave: false,
+  saveUninitialized: true,
+  secret: '123455'
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 //route to different kind of subApp;
 app.use(function(req, res, next){

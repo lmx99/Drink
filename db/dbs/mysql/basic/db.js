@@ -1,6 +1,4 @@
-var cfg = require(ROOT_DIR+'/db/include/conf.js');
-var Promise = require('promise');
-
+var cfg = require(ROOT_DIR+'/db/include/conf.js')();
 module.exports = function(){
 
 	var mysql = require('promise-mysql');
@@ -37,19 +35,19 @@ module.exports = function(){
 		user: cfg.username,
 		password: cfg.password,
 		database: cfg.database,
-		connectionLimit: 10
+		connectionLimit: 20
 	});
 
 	function _db () {
-		var selfFormat = (query, values)=>{
+		var selfFormat = function(query, values){
 
 			if (!values) return query;
 
-			query = query.replace(/\s$_(?=[a-z])/g,' '+cfg.prefix);
+			query = query.replace(/\s\$_(?=[a-z])/g,' '+cfg.prefix);
 			query = mysql.format(query, values);
 			return query;
 
-		}
+		};
 		/*
 		Numbers are left untouched
 		Booleans are converted to true / false
@@ -63,31 +61,29 @@ module.exports = function(){
 		NaN / Infinity are left as-is. MySQL does not support these, and trying to insert them as values will trigger MySQL errors until they implement support.
 		*/
 		this.query =  (sql,values) => {
-			return this.db.getConnection().then( (conn)=>{
-				connection.config.queryFormat = selfFormat;
+			var conn;
+			return pool.getConnection().then( (connection)=>{
+				conn = connection;
+
 				return conn.query({
 
-					sql: sql,
-					timeout: 40000, // 40s
-					values: values
+					sql: selfFormat(sql, values),
+					timeout: 10000, // 40s
 
 				}).then((rows)=>{
-
+					console.log(rows);
 					conn.release();
 					return rows;
 
 				});
 
-			} ).catch((err)=>{
-				return err;
-			})
+			});
 		}
 
 		this.transaction = (sqlArr)=>{
 			var conn;
 
-			return this.db.getConnection().then( (connection)=>{
-				connection.config.queryFormat = selfFormat;
+			return pool.getConnection().then( (connection)=>{
 				conn = connection;
 
 				return conn.beginTransaction();
@@ -96,7 +92,7 @@ module.exports = function(){
 					
 			  return Promise.all(sqlArr.map((sqlObj) => {
 
-			  	return conn.query(sqlObj.sql, sqlObj.values);
+			  	return conn.query( selfFormat(sqlObj.sql, sqlObj.values) );
 
 			  }));
 
@@ -126,10 +122,10 @@ module.exports = function(){
 
 	return function(){
 		if (!_instance) {
-			return _instance;
+			_instance = new _db();
 		}
 
-		return new _db();
+		return _instance;
 	};
 }()
 
