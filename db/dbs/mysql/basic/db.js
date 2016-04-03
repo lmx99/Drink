@@ -71,7 +71,9 @@ module.exports = function(){
 					timeout: 10000, // 40s
 
 				}).then((rows)=>{
-					console.log(rows);
+					$.config.debug && console.log('---db.js ---')
+					$.config.debug && console.log(rows);
+					console.log('---db.js ---')
 					conn.release();
 					return rows;
 

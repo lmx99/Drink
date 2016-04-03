@@ -1,6 +1,3 @@
-var Promise = require('bluebird');
-Promise.longStackTraces();
-var _  = require(`${ROOT_DIR}/lib/underscore.ext.js`);
 var UserLG = function(){
 
 	var dbi = require(ROOT_DIR+'/db/pool/User.DBAPI.js')();
@@ -48,9 +45,8 @@ var UserLG = function(){
 				},
 
 				usernameUnique : (resolve, reject) => {
-					dbi.getUserCounts( data.username ).then((num)=>{
-						
-						parseInt(num)? reject( $.lng.USERNAME_HAVE_BEEN_REGISTER ) : resolve( true );
+					dbi.getUserCounts( data.username ).then((revals)=>{
+						parseInt(_.values(revals[0])[0])? reject( $.lng.USERNAME_HAVE_BEEN_REGISTER ) : resolve( true );
 					})
 				},
 
@@ -58,14 +54,13 @@ var UserLG = function(){
 					/^\w{32}$/.test(data.password)? resolve( true ) : reject( $.lng.PASSWORD_ERR );
 				},
 
-				phoneNumberCheck : (resolve, reject) => {
+				IDPhoneCheck : (resolve, reject) => {
 					data.IDPhone == data.localIDPhone ? resolve( true ) : reject( $.lng.VERIFIED_AND_SENDPHONE_NOT_THE_SAME );
 				},
 
-				phoneNumberUnique : ((resolve, reject) => {
-					dbi.getPhoneCounts( data.IDPhone ).then((num)=>{
-
-						parseInt(num)? reject( $.lng.PHONE_NUMBER_HAVE_BEEN_REGISTER ) : resolve( true );
+				IDPhoneUnique : ((resolve, reject) => {
+					dbi.getPhoneCounts( data.IDPhone ).then((revals)=>{
+						parseInt(_.values(revals[0])[0])? reject( $.lng.PHONE_NUMBER_HAVE_BEEN_REGISTER ) : resolve( true );
 					})
 				}),
 
