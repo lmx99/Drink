@@ -1,6 +1,6 @@
-console.log('userRH start');
+$.config.debug && console.log('userRH start');
 var userLG = require('../logics/User.LG.js')();
-console.log('userLG end');
+$.config.debug && console.log('userLG end');
 var UserRH = function(){
 
 	var _resourceHandler = function (args) {
@@ -23,17 +23,21 @@ var UserRH = function(){
 
 						console.log(PIN);
 						res.json({
-							status : '0',
+							status : 0,
 							msg : $.lng.SUCCESS
 						});
 
 					}).catch((err)=>{
 						$.config.debug && console.log(err);
 			    		$.config.debug && console.log(err.stack);
-						res.json({
+						res.status(400).json({
+							status:400,
+							msg:err
+						});
+						/*res.json({
 							status : '1',
 							msg : err
-						});
+						});*/
 					});
 				}
 			},
@@ -48,7 +52,7 @@ var UserRH = function(){
 
 					userLG.checkPIN( req.session.PIN, req.query.PIN ).then((PIN)=>{
 						res.json({
-							status : '0',
+							status : 0,
 							msg : $.lng.SUCCESS
 						})
 					}).catch((err)=>{
@@ -56,8 +60,8 @@ var UserRH = function(){
 						$.config.debug && console.log(err);
 			    		$.config.debug && console.log(err.stack);
 
-						res.json({
-							status : '1',
+						res.status(400).json({
+							status : 400,
 							msg : err
 						})
 					})
@@ -68,33 +72,33 @@ var UserRH = function(){
 		this.users =  [
 			{
 				a: 'register',
-			    m: 'put',
-			    p: /^\/users\/?$/,
-			    h: (req, res, next) => {
-			    	console.log(req.body);
-			    	console.log(req.session);
-			    	var data = {
-			    		username : req.body.username,
-			    		password : req.body.password,
-			    		IDPhone	 : req.body.IDPhone,
-			    		PIN 	 : req.body.PIN,
-			    		localPIN : req.session.PIN,
-			    		localIDPhone: req.session.IDPhone
-			    	}
+				m: 'put',
+				p: /^\/users\/?$/,
+				h: (req, res, next) => {
+					$.config.debug && console.log(req.body);
+					$.config.debug && console.log(req.session);
+					var data = {
+						username : req.body.username,
+						password : req.body.password,
+						IDPhone  : req.body.IDPhone,
+						PIN 	 : req.body.PIN,
+						localPIN : req.session.PIN,
+						localIDPhone: req.session.IDPhone
+					}
 			    	userLG.register(data).then((result)=>{
-			    		console.log(result);
+			    		$.config.debug && console.log(result);
 				        res.json({
-				        	status : "0",
+				        	status : 0,
 				        	msg : $.lng.SUCCESS
 				        });
 			    	}).catch((err)=>{
-			    		$.config.debug && console.log(err)  
+			    		$.config.debug && $.config.debug && console.log(err)  
 
-			    		$.config.debug && console.log(err.stack);
+			    		$.config.debug && $.config.debug && console.log(err.stack);
 			    		
-			    		res.json({
-			    			status:'1',
-				        	msg:err
+			    		res.status(400).json({
+			    			status : 400,
+				        	msg : err
 				        });
 			    	})
 			    }
@@ -124,8 +128,8 @@ var UserRH = function(){
 	            p: /^\/users\/@id\/?$/,
 	            h: (req, res, next) => {
 	            	var id = req.query;
-	            	console.log(req.query);
-	            	console.log(req.path);
+	            	$.config.debug && console.log(req.query);
+	            	$.config.debug && console.log(req.path);
 	                res.json({
 	                	regiser: 'sdfsdfdddd'
 	                })
@@ -139,6 +143,21 @@ var UserRH = function(){
 	    		m: "put", 
 	    		p: /^\/users\/@id\/logID\/?$/, 
 	    		h: (req, res, next) => {
+	    			userLG.login( req.query.id, req.body.password, req.ip, req.session.id).then(()=>{
+	    				req.session.username = req.query.id;
+	    				$.session = req.session;
+	    				res.json({
+	    					status : 0,
+	    					msg: $.lng.SUCCESS
+	    				})
+	    			}).catch((err)=>{
+	    				$.config.debug && console.log(err.stack);
+	    				res.status(400).json({
+	    					status : 400,
+	    					msg: err
+	    				})
+	    			})
+
 
 	    		}
 	    	},
@@ -147,7 +166,7 @@ var UserRH = function(){
 	    		m: "delete",
 	    		p: /^\/users\/@id\/logID\/?$/, 
 	    		h: (req, res, next) => {
-
+	    			
 	    		}
 
 	    	}

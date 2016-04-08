@@ -61,6 +61,8 @@ module.exports = function(){
 		NaN / Infinity are left as-is. MySQL does not support these, and trying to insert them as values will trigger MySQL errors until they implement support.
 		*/
 		this.query =  (sql,values) => {
+			console.log(sql);
+			console.log(values);
 			var conn;
 			return pool.getConnection().then( (connection)=>{
 				conn = connection;
@@ -68,7 +70,7 @@ module.exports = function(){
 				return conn.query({
 
 					sql: selfFormat(sql, values),
-					timeout: 10000, // 40s
+					timeout: 10000 // 40s
 
 				}).then((rows)=>{
 					$.config.debug && console.log('---db.js ---')

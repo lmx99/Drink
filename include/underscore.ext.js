@@ -1,5 +1,10 @@
 var _ = require('underscore');
 _.mixin({
+
+	time : function(){
+		return parseInt( (new Date()).getTime()/1000 );
+	},
+
 	inheritPrototype : function(childClass,parentClass){
 		console.log('F.prototype-0');
 		function F () {};

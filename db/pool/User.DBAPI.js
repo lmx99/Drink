@@ -7,7 +7,7 @@ module.exports = function(){
 		}
 
 		bridge.User.call(this,'func');
-
+		
 	}
 
 	return UserDBAPI;

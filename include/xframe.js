@@ -37,6 +37,7 @@ global.$ = function(){
 
 	$.config = require('./config.js');
 	$.lng = require('./language.js')($.config.language);
+	$.des = require('./descript.js');
 	$.router = require('./routes.js');
 
 

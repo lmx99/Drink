@@ -17,16 +17,19 @@ function Model(tableName){
 	this.table = require('./tables.js')(tableName);
 	this.db = require('./db.js')();
 
-	//select,add,upd,del;
+	//sel,add,upd,del;
 	$.config.dubug && console.log('model this.q before;');
 	this.q = this.db.query;
 
-	this.select = (fields, where) => {
+	this.get = (fields, where) => {
 		var fields = fields.filter((value)=>{
-			this.table.fields.indexOf(value);
+			$.config.debug && console.log(this.table.fields.indexOf(value));
+			return this.table.fields.indexOf(value)>-1;
 		});
 
-		if(!where)return Promise.reject(new error('no where'))
+		if(!fields)return Promise.reject(new Error('field no found'));
+
+		if(!where)return Promise.reject(new Error('no where'));
 
 		var sql = 'SELECT ?? FROM ?? ' + where;
 		var values = [fields, this.table.name];
@@ -36,13 +39,16 @@ function Model(tableName){
 
 	this.add = (data) => {
 		data = this.filter(data);
+		$.config.debug && console.log('********* ADD ********');
+		$.config.debug && console.log(data);
+
 		if (_.isArray(data)) {
 			var keys;
 			var vals = [];
 			for (var i = 0; i < data.length; i++) {
 				 !i ? (keys =_(data[i]).keys) : '';
 				if(keys!=_(data[i]).keys){
-					return Promise.reject(new error('not the same key'));
+					return Promise.reject(new Error('not the same key'));
 				}else{
 					keys = _.keys(data[i]);
 				}
@@ -65,11 +71,13 @@ function Model(tableName){
 
 	this.upd =  (data, where, isAll) => {
 		data = this.filter(data);
+		$.config.debug && console.log('*********upd********');
+		$.config.debug && console.log(data);
 		if(where){
 			if(isAll){
-				var sql = `UPDATE ?? SET ? ${where}`;
+				var sql = `UPDATE ${this.table.name} SET ? ${where}`;
 			}else{
-				var sql = `UPDATE ?? SET ? ${where} limit 1`;
+				var sql = `UPDATE ${this.table.name} SET ? ${where} limit 1`;
 			}
 		}else{
 			return Promise.reject(new error('did not '))

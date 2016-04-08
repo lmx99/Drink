@@ -38,17 +38,15 @@ module.exports = (function () {
 		}
 
 		this.getUserInfos = (fields, username)=>{
-			return this.m('users').get(fields, `where user_name='${username}'`);
+			return this.m('users').get(fields, `where user_name=${username}`);
 		}
 
 		this.updateUserInfos = (data, username)=>{
-			console.log(data);
-			return this.m('users').upd(data, `where user_name='${username}'` );
+			return this.m('users').upd(data, `where user_name=${username}` );
 		}
 
 		this.pubLog = (data)=>{
-			console.log(data);
-			return this.m('pubLog').add(data);
+			return this.m('users').add(data);
 		}
 
 	};

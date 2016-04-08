@@ -1,0 +1,7 @@
+module.exports = {
+	REGISTER : 1,
+	LOGIN : 2,
+	SEEK_BACK: 3,
+	UPDATE_INFORMATION: 4,
+	CHANGE_IDPHONE: 5
+};

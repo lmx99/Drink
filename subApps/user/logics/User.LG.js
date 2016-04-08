@@ -5,8 +5,62 @@ var UserLG = function(){
 	var _logic = function(args){
 
 		if(args!='func'){
-			if(!(this instanceof _logic)) return new _logic();
+			if(!(this instanceof _logic)) return new _logic(args);
 		}
+
+		this.login = ( username, password, ip, sessionId ) => {
+			var accessConditions = {
+				usernameFormat : $((resolve, reject) => {
+					/^[a-z][a-z 0-9]{5,19}$/.test(username) ? resolve(true) : reject($.lng.LOW_CASE_LETTER_AND_NUMBER_REQUIRED_AND_FIRST_TO_BE_LETTER);
+				}),
+
+				usernameExsit : $((resolve, reject) => {
+					dbi.getUserCounts( username ).then((revals)=>{
+						var num = parseInt(_.values(revals[0])[0]);
+						num ? resolve(true) : reject($.lng.USER_HAVE_NOT_EXSIT);
+					});
+				}),
+
+				passwordCorrect : $((resolve, reject) => {
+					dbi.getUserInfos( ['password'], username ).then((revals)=>{
+						$.config.debug && console.log(revals[0]['password']);
+						revals[0]['password']==_.md5(password) ? resolve(true) : reject($.lng.PASSWORD_ERR);
+					})
+				})
+			};
+
+			return $( _.values(accessConditions) ).then((arr) => {
+				
+				$.config.debug && console.log('userlogic condis-----amos');
+				return dbi.updateUserInfos({
+
+					last_login: _.time(),
+					last_ip: ip,
+					session_id: sessionId
+
+				}, username).then((revals)=>{
+					$.config.debug && console.log('updateUserInfos condis-----amos');
+					$.config.debug && console.log(revals);
+					$.config.debug && console.log('/updateUserInfos condis-----amos');
+					return dbi.pubLog({
+						user_name : username,
+						event_id : $.des.LOGIN,
+						add_time: _.time()
+					});
+
+				}).then((revals)=>{
+
+					$.config.debug && console.log('pubLog condis-----amos');
+					$.config.debug && console.log(revals);
+					$.config.debug && console.log('/pubLog condis-----amos');
+
+
+				});
+
+				$.config.debug && console.log('/userlogic condis-----amos');
+
+			});
+		};
 
 		this.sendPIN = (IDPhone) => {
 			if(/\d{11}/.test(IDPhone)){
@@ -73,7 +127,7 @@ var UserLG = function(){
 			var promiseAccessConditions = _.values( accessConditions ).map(function(func) {
 				return $(func);
 			});
-			
+
 			return $(promiseAccessConditions).then((arr)=>{
 
 				dbi.addUser({
@@ -81,10 +135,12 @@ var UserLG = function(){
 					password  : _.md5(data.password),
 					id_phone  : data.IDPhone
 				}).then((results)=>{
-					console.log('-------');
-					console.log(results);
-					console.log('-------');
+
+					$.config.debug && console.log('-------');
+					$.config.debug && console.log(results);
+					$.config.debug && console.log('-------');
 					return results;
+
 				});
 			});
 			
