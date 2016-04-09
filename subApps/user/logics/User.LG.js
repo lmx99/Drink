@@ -8,6 +8,68 @@ var UserLG = function(){
 			if(!(this instanceof _logic)) return new _logic(args);
 		}
 
+		this.changeIDPhone = ( newIDPhone, IDPhone, PIN, sessionPIN, sessionIDPhone )=>{
+			
+			if(PIN!=sessionPIN) return $().reject($.lng.PIN_ERR);
+
+			if(IDPhone!=sessionIDPhone) return $().reject($.lng.VERIFIED_AND_SENDPHONE_NOT_THE_SAME);
+			
+
+			return dbi.getUserInfosByIDPhone(['user_name'], IDPhone).then((revals)=>{
+				console.log(revals);
+				if(_.isEmpty(revals)){ 
+					return $().reject($.lng.HAVE_NOT_REGISTER);
+				}
+				var username = revals[0]['user_name'];
+				return dbi.updateUserInfos({
+					id_phone : newIDPhone
+				}, username);
+
+			}).then((revals)=>{
+				$.config.debug && console.log('============= seekback =============');
+				$.config.debug && console.log(revals);
+				$.config.debug && console.log('============= /seekback =============');
+
+				return revals;
+			});
+
+		}
+
+		this.seekBack = ( IDPhone, password, PIN, sessionPIN, sessionIDPhone )=>{
+
+			if(PIN!=sessionPIN) return $().reject($.lng.PIN_ERR);
+
+			if(IDPhone!=sessionIDPhone) return $().reject($.lng.VERIFIED_AND_SENDPHONE_NOT_THE_SAME);
+			
+
+			return dbi.getUserInfosByIDPhone(['user_name'], IDPhone).then((revals)=>{
+				console.log(revals);
+				if(_.isEmpty(revals)){ 
+					return $().reject($.lng.HAVE_NOT_REGISTER);
+				}
+				var username = revals[0]['user_name'];
+				return dbi.updateUserInfos({
+					password : _.md5(password)
+				}, username);
+
+			}).then((revals)=>{
+				return revals;
+				$.config.debug && console.log('============= seekback =============');
+				$.config.debug && console.log(revals);
+				$.config.debug && console.log('============= /seekback =============');
+
+			});
+		}
+
+		this.logout = ( username ) => {
+
+			return dbi.pubLog({
+				user_name : username,
+				event_id : $.des.LOGOUT,
+				add_time: _.time()
+			});
+		}
+
 		this.login = ( username, password, ip, sessionId ) => {
 			var accessConditions = {
 				usernameFormat : $((resolve, reject) => {

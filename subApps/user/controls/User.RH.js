@@ -21,7 +21,7 @@ var UserRH = function(){
 						req.session.PIN = PIN;
 						req.session.IDPhone = req.query.IDPhone;
 
-						console.log(PIN);
+						$.config.debug && console.log(PIN);
 						res.json({
 							status : 0,
 							msg : $.lng.SUCCESS
@@ -51,10 +51,12 @@ var UserRH = function(){
 					$.config.debug && console.log(req.body);
 
 					userLG.checkPIN( req.session.PIN, req.query.PIN ).then((PIN)=>{
+
 						res.json({
 							status : 0,
 							msg : $.lng.SUCCESS
-						})
+						});
+
 					}).catch((err)=>{
 
 						$.config.debug && console.log(err);
@@ -63,8 +65,9 @@ var UserRH = function(){
 						res.status(400).json({
 							status : 400,
 							msg : err
-						})
-					})
+						});
+
+					});
 				}
 			}
 		];
@@ -86,11 +89,17 @@ var UserRH = function(){
 						localIDPhone: req.session.IDPhone
 					}
 			    	userLG.register(data).then((result)=>{
+
 			    		$.config.debug && console.log(result);
+
+			    		delete req.session.PIN;
+			    		delete req.session.IDPhone;
+
 				        res.json({
 				        	status : 0,
 				        	msg : $.lng.SUCCESS
 				        });
+
 			    	}).catch((err)=>{
 			    		$.config.debug && $.config.debug && console.log(err)  
 
@@ -104,11 +113,77 @@ var UserRH = function(){
 			    }
 			},
 			{
-				a: 'update user infomation',
+				a: 'change user IDPhone',
 				m: 'post',
-				p: /^\/users\/@id\/?$/,
+				p: /^\/users\/IDPhone\/@IDPhone\/?$/,
 				h: (req, res, next) => {
+					console.log(req.query);
+					console.log(req.body);
+					console.log(req.session);
+					var IDPhone = req.query.IDPhone;
+					var newIDPhone = req.body.newIDPhone;
+					var PIN  = req.body.PIN;
+					var sessionPIN = req.session.PIN;
+					var sessionIDPhone = req.session.IDPhone;
+					console.log('===no err===');
 
+					userLG.changeIDPhone( newIDPhone, IDPhone, PIN, sessionPIN, sessionIDPhone ).then((revals)=>{
+						delete req.session.PIN;
+			    		delete req.session.IDPhone;
+
+						console.log(revals);
+						res.json({
+							status:0,
+							msg: $.lng.SUCCESS
+						});
+
+					}).catch((err)=>{
+
+						console.log(err);
+						console.log(err.stack);
+
+						res.status(400).json({
+							status: 400,
+							msg: err
+						});
+
+					});
+				}
+
+			},
+			{
+				a: 'seek back password',
+				m: 'post',
+				p: /^\/users\/@IDPhone\/?$/,
+				h: (req, res, next) => {
+					console.log(req.query);
+					console.log(req.body);
+					console.log(req.session);
+					var IDPhone = req.query.IDPhone;
+					var password = req.body.password;
+					var PIN  = req.body.PIN;
+					var sessionPIN = req.session.PIN;
+					var sessionIDPhone = req.session.IDPhone;
+					console.log('===no err===');
+
+					userLG.seekBack( IDPhone, password, PIN, sessionPIN, sessionIDPhone ).then((revals)=>{
+						delete req.session.PIN;
+			    		delete req.session.IDPhone;
+
+						console.log(revals);
+						res.json({
+							status:0,
+							msg: $.lng.SUCCESS
+						});
+
+					}).catch((err)=>{
+						console.log(err);
+						console.log(err.stack);
+						res.status(400).json({
+							status: 400,
+							msg: err
+						});
+					});
 				}
 
 			},
@@ -143,6 +218,7 @@ var UserRH = function(){
 	    		m: "put", 
 	    		p: /^\/users\/@id\/logID\/?$/, 
 	    		h: (req, res, next) => {
+
 	    			userLG.login( req.query.id, req.body.password, req.ip, req.session.id).then(()=>{
 	    				req.session.username = req.query.id;
 	    				$.session = req.session;
@@ -166,8 +242,15 @@ var UserRH = function(){
 	    		m: "delete",
 	    		p: /^\/users\/@id\/logID\/?$/, 
 	    		h: (req, res, next) => {
-	    			
+	    			userLG.logout(req.query.id);
+	    			delete req.session.username;
+	    			res.json({
+    					status : 0,
+    					msg: $.lng.SUCCESS
+    				})
 	    		}
+    			
+
 
 	    	}
 	    ]

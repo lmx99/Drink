@@ -41,6 +41,10 @@ module.exports = (function () {
 			return this.m('users').get(fields, `where user_name='${username}'`);
 		}
 
+		this.getUserInfosByIDPhone = (fields, IDPhone) => {
+			return this.m('users').get(fields, `where id_phone='${IDPhone}'`);
+		}
+
 		this.updateUserInfos = (data, username)=>{
 			console.log(data);
 			return this.m('users').upd(data, `where user_name='${username}'` );
